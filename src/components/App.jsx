@@ -1,5 +1,5 @@
 import {useEffect, useState } from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { Dna } from 'react-loader-spinner';
 import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './Searchbar';
@@ -26,15 +26,15 @@ const App =()=>{
 
 
 useEffect(()=>{
-  if(searchQuery === '') return
-  setStatus(statusCode.PENDING)
-  fetch(searchQuery, page, perPage).then(
+    if(searchQuery === '') return
+    setStatus(statusCode.PENDING)
+    fetch(searchQuery, page, perPage).then(
     ({hits, totalHits}) => {    
-      setHits(prevHits => [...prevHits, ...hits])
-      setTotalHits(totalHits)
-      setStatus(statusCode.RESOLVED)
-    }
-  ).catch (setStatus(statusCode.ERROR))
+    setHits(prevHits => [...prevHits, ...hits])
+    setTotalHits(totalHits)
+    setStatus(statusCode.RESOLVED)
+  }
+).catch(setStatus(statusCode.ERROR))
 
 },[ page, searchQuery ])
 
@@ -58,7 +58,7 @@ useEffect(()=>{
     <AppDiv>
       <Searchbar onSubmit={handelForm} />
 
-      {totalHits.length !== 0 && <ImageGallery hits={hits} />}
+      {totalHits.length !== 0 && status !== statusCode.ERROR && <ImageGallery hits={hits} />}
 
       {page < totalPage && <Button onClick={onClick} />}
 
@@ -73,8 +73,6 @@ useEffect(()=>{
             wrapperClass="dna-wrapper"
           />
         </Spiner>)}
-
-        {status === statusCode.ERROR &&  toast.error("Not found")}
       <ToastContainer autoClose={2000} />
     </AppDiv>
   );
