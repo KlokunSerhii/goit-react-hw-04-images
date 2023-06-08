@@ -1,13 +1,12 @@
 import {useEffect, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
-import { Dna } from 'react-loader-spinner';
 import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './Searchbar';
 import ImageGallery from './ImageGallery';
-import { AppDiv, Spiner } from './App.styled';
+import { AppDiv} from './App.styled';
 import fetch from '../services/api';
 import Button from './Button';
-
+import IsLoder from './IsLoding';
 
 const statusCode = {
   IDLE: 'idle',
@@ -58,21 +57,12 @@ useEffect(()=>{
     <AppDiv>
       <Searchbar onSubmit={handelForm} />
 
-      {totalHits.length !== 0 && status !== statusCode.ERROR && <ImageGallery hits={hits} />}
+      {totalHits.length !== 0 && <ImageGallery hits={hits} />}
 
       {page < totalPage && <Button onClick={onClick} />}
 
-      {status === statusCode.PENDING && 
-        (<Spiner>
-          <Dna
-            visible={true}
-            height="80"
-            width="80"
-            ariaLabel="dna-loading"
-            wrapperStyle={{}}
-            wrapperClass="dna-wrapper"
-          />
-        </Spiner>)}
+      {status === statusCode.PENDING && <IsLoder/>}
+      
       <ToastContainer autoClose={2000} />
     </AppDiv>
   );
