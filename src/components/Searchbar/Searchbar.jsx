@@ -43,48 +43,6 @@ const Searchbar = ({ onSubmit }) => {
   );
 };
 
-// class Searchbar extends Component {
-//   state = {
-//     searchQuery: '',
-//   };
-//   handelChanch = e => {
-//     this.setState({ searchQuery: e.target.value.toLowerCase() });
-//   };
-
-//   handelSumbit = e => {
-//     e.preventDefault();
-//     if (this.state.searchQuery.trim() === '') {
-//       return toast.error('Wow, Enter the text!');
-//     }
-//     this.props.onSubmit(this.state.searchQuery);
-//     this.setState({ searchQuery: '' });
-//   };
-
-//   render() {
-//     const { searchQuery } = this.state;
-//     return (
-//       <Header>
-//         <Form onSubmit={this.handelSumbit}>
-//           <Button type="submit">
-//             <Span>
-//               <TfiSearch />
-//             </Span>
-//           </Button>
-
-//           <Input
-//             type="text"
-//             autoComplete="off"
-//             autoFocus
-//             placeholder="Search images and photos"
-//             name="input"
-//             value={searchQuery}
-//             onChange={this.handelChanch}
-//           />
-//         </Form>
-//       </Header>
-//     );
-//   }
-// }
 Searchbar.propTypes = {
   onSubmit: PropTypes.func,
 };

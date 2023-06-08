@@ -1,5 +1,5 @@
-import { Component } from 'react';
-import { ToastContainer } from 'react-toastify';
+import {useEffect, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 import { Dna } from 'react-loader-spinner';
 import 'react-toastify/dist/ReactToastify.css';
 import Searchbar from './Searchbar';
@@ -8,88 +8,77 @@ import { AppDiv, Spiner } from './App.styled';
 import fetch from '../services/api';
 import Button from './Button';
 
+
 const statusCode = {
   IDLE: 'idle',
   PENDING: 'pending',
   RESOLVED: 'resolved',
   ERROR: 'error',
 };
-class App extends Component {
-  state = {
-    searchQuery: '',
-    hits: [],
-    page: 1,
-    perPage: 12,
-    totalHits: '',
-    status: statusCode.IDLE,
-  };
 
-  componentDidUpdate(_, prevState) {
-    try {
-      if (
-        prevState.searchQuery !== this.state.searchQuery ||
-        prevState.page !== this.state.page
-      ) {
-        this.setState({ status: statusCode.PENDING });
+const App =()=>{
+  const [searchQuery, setSearchQuery] = useState('')
+  const [hits, setHits] = useState([])
+  const [page, setPage] = useState(1)
+  const [totalHits, setTotalHits] = useState('')
+  const [status, setStatus] = useState(statusCode.IDLE)
+  const perPage = 12
 
-        fetch(this.state.searchQuery, this.state.page, this.state.perPage).then(
-          ({ hits, totalHits }) =>
-            this.setState(prevState => ({
-              totalHits: totalHits,
-              hits: [...prevState.hits, ...hits],
-              status: statusCode.RESOLVED,
-            }))
-        );
-      }
-    } catch {
-      this.setState({ status: statusCode.ERROR });
+
+useEffect(()=>{
+  if(searchQuery === '') return
+  setStatus(statusCode.PENDING)
+  fetch(searchQuery, page, perPage).then(
+    ({hits, totalHits}) => {    
+      setHits(prevHits => [...prevHits, ...hits])
+      setTotalHits(totalHits)
+      setStatus(statusCode.RESOLVED)
     }
-  }
+  ).catch (setStatus(statusCode.ERROR))
 
-  onClick = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+},[ page, searchQuery ])
+
+
+  const onClick = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  handelForm = searchQuery => {
-    this.setState({
-      searchQuery,
-      hits: [],
-      page: 1,
-      totalHits: '',
-      status: statusCode.IDLE,
-    });
+  const handelForm = searchQuery => {
+    setSearchQuery(searchQuery)
+    setHits([])
+    setPage(1)
+    setTotalHits('')
+    setStatus(statusCode.IDLE)
   };
 
-  render() {
-    const { hits, totalHits, page, perPage, status } = this.state;
-    return (
-      <AppDiv>
-        <Searchbar onSubmit={this.handelForm} />
-        {totalHits.length !== 0 && <ImageGallery hits={hits} />}
 
-        {page < Math.ceil(totalHits / perPage) && (
-          <Button onClick={this.onClick} />
-        )}
+  const totalPage = Math.ceil(totalHits / perPage)
 
-        {status === statusCode.PENDING && (
-          <Spiner>
-            <Dna
-              visible={true}
-              height="80"
-              width="80"
-              ariaLabel="dna-loading"
-              wrapperStyle={{}}
-              wrapperClass="dna-wrapper"
-            />
-          </Spiner>
-        )}
+  return (
+    <AppDiv>
+      <Searchbar onSubmit={handelForm} />
 
-        <ToastContainer autoClose={3000} theme="colored" />
-      </AppDiv>
-    );
-  }
+      {totalHits.length !== 0 && <ImageGallery hits={hits} />}
+
+      {page < totalPage && <Button onClick={onClick} />}
+
+      {status === statusCode.PENDING && 
+        (<Spiner>
+          <Dna
+            visible={true}
+            height="80"
+            width="80"
+            ariaLabel="dna-loading"
+            wrapperStyle={{}}
+            wrapperClass="dna-wrapper"
+          />
+        </Spiner>)}
+
+        {status === statusCode.ERROR &&  toast.error("Not found")}
+      <ToastContainer autoClose={2000} />
+    </AppDiv>
+  );
 }
+
 
 export default App;
